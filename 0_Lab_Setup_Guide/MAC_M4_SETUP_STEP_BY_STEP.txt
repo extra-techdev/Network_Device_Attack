@@ -1,0 +1,197 @@
+========================================================================
+  LAB SETUP ON A MacBook Air M4 (Apple Silicon)  -  STEP BY STEP
+  For: MD Ala Uddin
+  Use this file instead of the generic VirtualBox .docx guide.
+  VirtualBox does NOT work well on Apple Silicon; we use UTM instead.
+========================================================================
+
+READ THIS FIRST
+  - Your M4 is an ARM chip. Kali Linux has an ARM64 build that runs fast.
+  - Metasploitable2 (the vulnerable Linux target) and old Windows are
+    x86 only. On your Mac they run under EMULATION = correct but slow.
+  - Do each PART in order. Copy-paste the commands exactly.
+  - macOS screenshot: press  Shift + Command + 4 , then drag a box.
+    The image saves to your Desktop. (Shift+Command+5 = more options.)
+  - You do NOT need the internet on the VMs. They stay isolated.
+
+========================================================================
+PART 1 - INSTALL HOMEBREW + QEMU (disk converter)
+========================================================================
+1. Open the Terminal app (Spotlight: Cmd+Space, type "Terminal").
+2. Install Homebrew (paste one line, press Return, follow prompts):
+
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+3. When it finishes it prints two "export PATH" lines - paste and run
+   them so `brew` works (or just close and reopen Terminal).
+4. Install the qemu tools (we need qemu-img to convert the disk):
+
+   brew install qemu
+
+5. Check it worked:
+
+   qemu-img --version
+
+========================================================================
+PART 2 - INSTALL UTM (the virtualization app)
+========================================================================
+1. In Safari go to:  https://mac.getutm.app
+2. Click "Download" (this free version is identical to the paid App
+   Store one; the App Store charge is just to support the developers).
+3. Open the downloaded UTM.dmg and drag UTM into Applications.
+4. Open UTM once so macOS allows it to run.
+
+========================================================================
+PART 3 - ATTACKER VM: KALI LINUX (ARM64)  [this part is fast/native]
+========================================================================
+EASIEST WAY - use UTM's built-in gallery:
+1. In UTM click "Create a New Virtual Machine" ... or the "+" ...
+   then look for "Browse UTM Gallery" (opens a web page of prebuilt VMs).
+2. Choose "Kali Linux" (the ARM64 / Apple Silicon one). Download it.
+3. Back in UTM, open the downloaded .utm file. It appears in the left list.
+4. Press the Play (>) button. Log in with:  kali / kali
+5. Open a terminal inside Kali and install the lab tools:
+
+   sudo apt update
+   sudo apt install -y nmap netcat-traditional wget enum4linux
+
+MANUAL WAY (if the gallery image is missing):
+   - Download the "Apple Silicon (ARM64)" Kali INSTALLER image from
+     https://www.kali.org/get-kali/#kali-installer-images
+   - In UTM: New VM -> Virtualize -> Linux -> point it at the .iso,
+     give it 4096 MB RAM and a 25 GB disk, finish, then install Kali.
+   - If the screen is black on boot: VM Settings -> Display -> turn OFF
+     "GPU Accelerated (GL)" and set emulated display to "virtio-ramfb".
+
+========================================================================
+PART 4 - LINUX TARGET VM: METASPLOITABLE2 (x86, emulated)  [slow]
+========================================================================
+1. Download Metasploitable2 (a .zip containing a .vmdk disk):
+   https://sourceforge.net/projects/metasploitable/files/Metasploitable2/
+2. In Finder, unzip it. You get a folder with "Metasploitable.vmdk".
+3. Convert the disk to UTM's format. In Terminal, cd into that folder,
+   for example:
+
+   cd ~/Downloads/Metasploitable2-Linux
+   qemu-img convert -f vmdk -O qcow2 Metasploitable.vmdk metasploitable2.qcow2
+
+4. In UTM: Create a New Virtual Machine -> "Emulate" (NOT Virtualize)
+   -> Operating System: "Other" -> skip/clear the boot ISO ->
+   Architecture: "x86_64" , System: "Standard PC (q35)" is fine ->
+   RAM 1024 MB, CPU Cores 2 -> finish (any dummy disk size is ok).
+5. Select the new VM -> click the settings (slider) icon:
+   a. Under "QEMU": UNcheck "UEFI Boot" (Metasploitable uses legacy BIOS).
+   b. Under "Drives": delete the empty default drive, then
+      "Import Drive" and choose the metasploitable2.qcow2 you made.
+      Set its interface to "IDE" (safest). Make it the boot drive.
+6. Save, then Play. First boot is SLOW (minutes) - this is normal.
+7. Log in:  msfadmin / msfadmin  then find its IP:
+
+   ifconfig
+
+   Write down the inet address, e.g. 192.168.64.x or 10.x - this is
+   TARGET_IP and you will use it in the lab commands.
+
+========================================================================
+PART 5 - ISOLATED NETWORK (Host Only) + VERIFY
+========================================================================
+Both VMs must be on the SAME isolated network so they can talk to each
+other but not the internet.
+
+1. For EACH VM (Kali and Metasploitable2): Settings -> Network ->
+   "Network Mode" = "Host Only". Save.
+2. Start both VMs.
+3. On Metasploitable2 run `ifconfig`, note TARGET_IP.
+4. On Kali run `ip a` (or ifconfig), note KALI_IP (this is ATTACKER_IP).
+5. From Kali, prove they can see each other AND that the internet is
+   blocked:
+
+   ping -c 3 TARGET_IP      # should REPLY  (good)
+   ping -c 3 8.8.8.8        # should FAIL/timeout (good = isolated)
+
+   (Replace TARGET_IP with the real number.)
+
+IF the two VMs cannot ping each other on "Host Only":
+   - Set BOTH instead to Network Mode "Emulated VLAN" (a.k.a. Shared).
+     They will then share one isolated subnet. Re-check the pings.
+   - UTM networking is the one fiddly part; one of these two modes works.
+
+========================================================================
+PART 6 - SNAPSHOT / BACKUP (required evidence)
+========================================================================
+UTM's snapshot support is limited, so the reliable way to get a
+"revert point" AND the screenshot the tutorial wants is to CLONE:
+
+1. Shut down the VM.
+2. In UTM's left list, right-click the VM -> "Clone".
+3. Rename the clone:  prelab_MD_Ala_Uddin  (Week 6) and/or
+                      pre_scan_MD_Ala_Uddin (Week 10).
+4. SCREENSHOT the UTM window showing that clone in the list.
+   (If your UTM version shows a "Snapshot" menu item, you may use that
+    instead and screenshot it - either demonstrates the concept.)
+5. Also SCREENSHOT Settings -> Network showing "Host Only".
+
+These two images are your Week 6 pre-task and Tutorial 10 pre-task
+evidence (snapshot.png / network_mode.png).
+
+========================================================================
+PART 7 - WINDOWS TARGET (only needed for Tutorial 10)
+========================================================================
+Easiest on M4 = Windows 11 ARM in UTM:
+1. In UTM gallery / docs, follow "Windows 11 (ARM)". UTM provides a
+   helper (CrystalFetch) to download the official Windows 11 ARM ISO.
+2. New VM -> Virtualize -> Windows -> select that ISO -> install.
+3. Set its Network to "Host Only" (same as the others). In Windows open
+   Command Prompt and run `ipconfig` to get WINDOWS_IP.
+
+Reality note: Windows 11 ARM is modern and patched, so the scanner will
+report HARDENING issues (SMB signing, TLS ciphers, missing updates)
+rather than old CVEs like EternalBlue. The Windows report already says
+this - just record whatever your own scan shows. Do NOT try to emulate
+old x86 Windows; it is painfully slow on a laptop.
+
+If time is short, Tutorial 10 can be submitted with the Linux scan
+fully done and the Windows section noting the target type you used.
+
+========================================================================
+PART 8 - SCANNER
+========================================================================
+PRIMARY (reliable on ARM, already installed on Kali) - nmap vuln scripts:
+
+   sudo nmap --script vuln -sV TARGET_IP
+
+This is what the Session 9 and Tutorial 10 reports are built around, and
+the tutorials explicitly allow it when Nessus/OpenVAS is unavailable.
+
+OPTIONAL full scanner (OpenVAS/GVM) - only if you have ~1 hour spare:
+
+   sudo apt update && sudo apt install -y gvm
+   sudo gvm-setup          # downloads feeds; can take up to an hour
+   sudo gvm-check-setup    # should end all-green
+   sudo gvm-start          # web UI at https://127.0.0.1:9392
+
+   If gvm-setup errors out (known to be flaky on some Kali builds),
+   STOP and just use the nmap command above. Do not lose time on it.
+
+========================================================================
+PART 9 - RUN THE LABS AND CAPTURE EVIDENCE
+========================================================================
+Now follow the REMAINING_TASKS.txt inside each lab folder. Each one
+lists the exact commands and the exact screenshot to save:
+
+   1_Week6_Network_Device_Attacks/REMAINING_TASKS.txt
+   4_Session9_Command_and_Control/REMAINING_TASKS.txt
+   5_Tutorial10_Vulnerability_Scanning/REMAINING_TASKS.txt
+
+After capturing each screenshot (Shift+Cmd+4), move the image file into
+that folder's Screenshots/ subfolder, then open the matching .docx and
+paste it into the box marked [ INSERT SCREENSHOT: ... ].
+
+========================================================================
+DOWNLOAD LINKS (all official)
+========================================================================
+  UTM .............. https://mac.getutm.app
+  Kali Linux ....... https://www.kali.org/get-kali/
+  Metasploitable2 .. https://sourceforge.net/projects/metasploitable/files/Metasploitable2/
+  Homebrew ......... https://brew.sh
+========================================================================

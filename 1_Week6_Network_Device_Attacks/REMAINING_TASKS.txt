@@ -1,0 +1,25 @@
+WEEK 6 - WHAT REMAINS
+=====================
+Report writing (macro viruses + Stuxnet) is DONE inside
+Week6_Report_MD_Ala_Uddin.docx. Only the pre-task VM evidence remains.
+
+Do the setup first: 0_Lab_Setup_Guide/MAC_M4_SETUP_STEP_BY_STEP.txt
+(Parts 2-6). Then:
+
+TASK 1 - snapshot/clone evidence
+  1. In UTM, shut down the Kali VM.
+  2. Right-click it -> Clone -> rename the clone:  prelab_MD_Ala_Uddin
+  3. Screenshot (Shift+Cmd+4) the UTM window showing that clone listed.
+  4. Save the image into:  1_Week6.../Screenshots/
+     Suggested name: prelab_snapshot.png
+
+TASK 2 - network isolation evidence
+  1. Select the Kali VM -> Settings -> Network.
+  2. Make sure Network Mode = "Host Only".
+  3. Screenshot that Network settings panel.
+  4. Save into Screenshots/ as: network_mode.png
+
+FINISH
+  Open Week6_Report_MD_Ala_Uddin.docx, find the two boxes marked
+  [ INSERT SCREENSHOT: ... ] near the top, and paste the two images in.
+  Then submit.

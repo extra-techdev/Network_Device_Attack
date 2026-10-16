@@ -1,0 +1,79 @@
+========================================================================
+  NETWORK DEVICE ATTACK  -  WHAT IS DONE / WHAT REMAINS
+  Student: MD Ala Uddin   ID: 64310... (complete the trailing digits)
+  Machine: MacBook Air M4 (Apple Silicon / ARM)
+  Last updated by setup pass: see MAC_M4_SETUP_STEP_BY_STEP.txt
+========================================================================
+
+HOW TO READ THIS
+  [DONE]  = finished, ready to submit as-is
+  [YOU]   = needs YOU to do it on your Mac (I cannot run VMs for you)
+  Each lab folder has its own REMAINING_TASKS.txt with exact commands.
+
+------------------------------------------------------------------------
+QUICK SUMMARY
+------------------------------------------------------------------------
+  You can submit Week 7 and Week 8 right now. Nothing is missing there.
+  Week 6 research is written; only 2 setup screenshots remain.
+  Session 9 and Tutorial 10 reports are written; they need real
+  screenshots from VMs you still have to install.
+
+  To install the VMs, follow:  0_Lab_Setup_Guide/MAC_M4_SETUP_STEP_BY_STEP.txt
+  That guide is written specifically for your M4 Mac.
+
+------------------------------------------------------------------------
+PER-DELIVERABLE STATUS
+------------------------------------------------------------------------
+
+[DONE]  2_Week7_Denial_of_Service / DoS_Report_MD_Ala_Uddin.docx
+          Research report complete (incident, tool table, mitigations).
+          -> Nothing remains. Submit.
+
+[DONE]  3_Week8_Programming_for_Security / Week8_Programming_MD_Ala_Uddin.docx
+          All 4 activities answered. Working code in the code/ subfolder:
+          age.c (compiles), webpage.html, hello.py (runs).
+          -> Nothing remains. Submit.
+
+[DONE]  1_Week6 ... research part (macro viruses + Stuxnet) inside
+          Week6_Report_MD_Ala_Uddin.docx
+          -> Writing is finished.
+[YOU]   1_Week6 ... pre-task evidence (2 screenshots)
+          1. prelab snapshot/clone listed in UTM
+          2. network set to Host Only
+          -> See 1_Week6.../REMAINING_TASKS.txt
+
+[DONE]  4_Session9 ... C2_lab_MD_Ala_Uddin.docx  (3-page report written)
+[YOU]   4_Session9 ... 3 evidence items from the lab:
+          nmap_MD_Ala_Uddin.png, nc_wget_MD_Ala_Uddin.png, enum_MD_Ala_Uddin.txt
+          -> See 4_Session9.../REMAINING_TASKS.txt
+
+[DONE]  5_Tutorial10 ... Windows_Report + Linux_Report (both written)
+[YOU]   5_Tutorial10 ... 4 screenshots:
+          snapshot.png, network_mode.png, windows_scan.png, linux_scan.png
+          -> See 5_Tutorial10.../REMAINING_TASKS.txt
+
+------------------------------------------------------------------------
+INSTALL ORDER (do once, then it serves all 3 lab tasks)
+------------------------------------------------------------------------
+  STEP 1  Install Homebrew + qemu            (guide Part 1)
+  STEP 2  Install UTM                        (guide Part 2)
+  STEP 3  Install Kali Linux ARM64 (attacker)(guide Part 3)  - fast
+  STEP 4  Install Metasploitable2 (target)   (guide Part 4)  - slow (emulated)
+  STEP 5  Set Host-Only network + verify     (guide Part 5)
+  STEP 6  Make a clone/snapshot              (guide Part 6)
+  STEP 7  (Tutorial 10 only) Windows 11 ARM  (guide Part 7)
+  STEP 8  Scanner = nmap vuln (reliable)     (guide Part 8)
+  STEP 9  Run each lab + screenshot          (guide Part 9 + folder files)
+
+------------------------------------------------------------------------
+TIME / REALITY CHECK (important)
+------------------------------------------------------------------------
+  - Kali on M4 is native ARM and runs well.
+  - Metasploitable2 and old Windows are x86 only, so they run under
+    emulation and are SLOW. Boot can take several minutes. Be patient
+    and run ONE target VM at a time to save memory.
+  - Budget 1-2 hours for first-time install before the labs themselves.
+  - If a full scanner (OpenVAS) will not install, the tutorials ALLOW
+    the nmap vuln-script fallback, which this plan uses. Do not block on
+    OpenVAS.
+========================================================================
